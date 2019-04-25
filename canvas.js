@@ -36,6 +36,7 @@ window.addEventListener('keypress',
 function(){
     if(event.keyCode == 115){// 's'
         nextPoints = nextPoint(minPoint);
+        console.log(JSON.stringify(nextPoints))
         // nextPoints.push(next);
         // drawLine(minPoint.x,minPoint.y,next[0].x,next[0].y,'#AAAeee');
     }
@@ -48,10 +49,10 @@ function(){
         console.log(minPoint);
         console.log('nextPoints: '+ JSON.stringify(nextPoints));
         if(nextPoints.length==1){
-            drawLine(nextPoint[0].x,nextPoints[0].y,minPoint.x,minPoint.y,'#6B7CE8');
+            drawLine(nextPoints[0][1].x,nextPoints[0][1].y,minPoint.x,minPoint.y,'#6B7CE8');
         }
         else{
-            drawLine(minPoint.x,minPoint.y,nextPoint[0].x,nextPoints[0].y,'#6B7CE8');
+            drawLine(minPoint.x,minPoint.y,nextPoints[0][1].x,nextPoints[0][1].y,'#6B7CE8');
         }
         nextPoints.splice(nextPoints[0],1);
     }
@@ -166,8 +167,8 @@ function checkMinPoint(){
     }
     pointsAux = [...points];
     pointsAux.splice(indexOfMinPoint, 1);
-    return minPoint;
-    console.log('ponto minimo: '+ '('+minPoint.x+','+minPoint.y+')');
+    // return minPoint;
+    // console.log('ponto minimo: '+ '('+minPoint.x+','+minPoint.y+')');
 }
 /**
  * Inicialmente a função nextPoint recebe o pinto minimo no atributo startPoint 
@@ -181,23 +182,33 @@ function nextPoint(startPoint){
     let peseudoAngleArray = [];
     let max;
     let endPoint = new Vec2(1,0);
-    
+    console.log('minPoint: '+ JSON.stringify(minPoint));
+    startPoint = minPoint;
+    let aux;
+    let sub;
     while(pointsAux.length>0){
         peseudoAngleArray = [];
+        console.log('endPoint: '+ JSON.stringify(endPoint))
         //calcula os pseudos usando os pontos e guarda seus valores 
         for(let i = 0; i < pointsAux.length; i++){
-            // console.log('pseudo angulo de : '+endPoint.x+','+endPoint.y+' e '+pointsAux[i].x+','+pointsAux[i].y)
-            // console.log('= '+pseudoAngle1(endPoint,pointsAux[i]));
-            peseudoAngleArray.push([pointsAux[i],pseudoAngle1(endPoint,pointsAux[i])])
+            console.log('pseudo angulo de : '+endPoint.x+','+endPoint.y+' e '+pointsAux[i].x+','+pointsAux[i].y)
+            console.log('= '+pseudoAngle1(endPoint,pointsAux[i]));
+            peseudoAngleArray.push([i,pointsAux[i],pseudoAngle1(endPoint,pointsAux[i])])
         }
+        
         max = getMaxPseudoAngle(peseudoAngleArray);
-        // console.log('max objeto: '+ JSON.stringify(max))
-        // console.log('Ponto de maximo pseudoangulo :'+max[0].x +','+ max[0].y+ ';' +'pseudoangulo: '+ max[1]);
-        // console.log('pointsAux antes do splice: ' + JSON.stringify(pointsAux));
+        aux = endPoint;
+        sub = max[1].sub(startPoint);
+        drawLine(a,canvas.height,sub.x,sub.y);
+        startPoint = aux;
+        console.log('max objeto: '+ JSON.stringify(max))
+        console.log('Ponto de maximo pseudoangulo :'+max[1].x +','+ max[1].y+ ';' +'pseudoangulo: '+ max[2]);
+        console.log('pointsAux antes do splice: ' + JSON.stringify(pointsAux));
         pointsAux.splice(max[0],1);
-        // console.log('pointsAux depois do splice: ' + JSON.stringify(pointsAux));
+        console.log('pointsAux depois do splice: ' + JSON.stringify(pointsAux));
         pointsOrder.push(max);    
     }
+     console.log('pointsOrder: ' + JSON.stringify(pointsOrder[1]));
     return pointsOrder;
 }
 /**
@@ -209,10 +220,11 @@ function getMaxPseudoAngle(pseudoAngleArray){
     let max=[];
     let aux = 0;
     for(let i = 0; i< pseudoAngleArray.length;i++){
-        if(pseudoAngleArray[i][1]>aux){
+        if(pseudoAngleArray[i][2]>aux){
             max[0] = pseudoAngleArray[i][0];
             max[1] = pseudoAngleArray[i][1];
-            aux = pseudoAngleArray[i][1];
+            max[2] = pseudoAngleArray[i][2];
+            aux = pseudoAngleArray[i][2];
         }
     }
     return max;
@@ -223,6 +235,12 @@ class Vec2 {
         this.x = x;
         this.y = y;
     }
+    // constructor(x1,y1,x2,y2){
+    //     this.x1 = x1;
+    //     this.x2 = x2;
+    //     this.y1 = y1;
+    //     this.y2 = y2;
+    // }
         //norma do vetor(tamanho)
     magnitude(){
         return Math.sqrt(this.x * this.x + this.y * this.y);
@@ -251,12 +269,12 @@ class Vec2 {
         
         //adição dde vetores
      add (v) {
-        return Vec2(this.x + v.x, this.y + v.y);
+        return new Vec2(this.x + v.x, this.y + v.y);
     };
 
         //subtraçao de vetores
     sub(v) {
-        return Vec2(this.x - v.x, this.y - v.y);
+        return new Vec2(this.x - v.x, this.y -  v.y );
     };
 
 }
