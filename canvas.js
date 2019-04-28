@@ -12,8 +12,14 @@ let maxx;
 let miny;
 let center;
 let minPoint;
+let next_point;
 let indexOfMinPoint;
 let nextPoints = [];
+let points_interated;
+let dir_vec2;
+let initialPoints = [];
+let indexesOfNextsPoints = [];
+let indexOfMinPoint2;
 
 window.addEventListener('click', 
 	function(){
@@ -23,48 +29,94 @@ window.addEventListener('click',
 //desenha o vetor do ponto minimo
 window.addEventListener('keypress',
 	function(){
+        //calculo a minima só aqui e trago ele pro começo do vetor
 		if(event.keyCode == 97){// 'a'
+			checkMinPoint();
             drawLineMinPoint(event,minPoint);
+            //direcao antiga q uso pra ver qual o menor angulo
+            dir_vec2 = new Vec2(1,0);
+            //aqui conta qnts pontos ja foram olhados pra ignorar o points_interated primeiros
+            points_interated = 1;
             console.log(points)
+            console.log(minPoint)
             console.log(points[indexOfMinPoint].x,points[indexOfMinPoint].y)
             console.log(indexOfMinPoint)
         }
 });
     
 //calcula os pontos do fecho
+// window.addEventListener('keypress',
+// function(){
+//     if(event.keyCode == 115){// 's'
+//         //se ja tiver interado todos nao faz nada
+//     	if(points_interated > points.length) return;
+//         //calculo o proximo e trago ele pro começo
+//         next_point = nextPoint2(points_interated);
+//     	//aumento os interados
+//         points_interated++;
+//         //calculo a nova direcao
+//     	dir_vec2 = next_point.sub(minPoint);
+
+//         drawLine(minPoint.x,minPoint.y,next_point.x,next_point.y,'#AAAeee');
+//         minPoint = next_point;
+//         console.log(minPoint);
+//     }
+// });
+
 window.addEventListener('keypress',
 function(){
     if(event.keyCode == 115){// 's'
-        nextPoints = nextPoint(minPoint);
-        console.log(JSON.stringify(nextPoints))
-        // nextPoints.push(next);
-        // drawLine(minPoint.x,minPoint.y,next[0].x,next[0].y,'#AAAeee');
+        //se ja tiver interado todos nao faz nada
+    	while(points_interated <= points.length){
+    		//calculo o proximo e trago ele pro começo
+	        next_point = nextPoint2(points_interated);
+	        nextPoints.push(next_point);
+	    	//aumento os interados
+	        points_interated++;
+	        //calculo a nova direcao
+	    	dir_vec2 = next_point.sub(minPoint);
+
+	        drawLine(minPoint.x,minPoint.y,next_point.x,next_point.y,'#AAAeee');
+	        minPoint = next_point;
+	        console.log(minPoint);
+    	}
+    }
+    console.log(nextPoints);
+});
+
+//gera arquivo com os pontos em ordem
+window.addEventListener('keypress',
+function(){
+	console.log(JSON.stringify(nextPoints));
+    if(event.keyCode == 100){// 'd'
+    	let saida = 'o Jarvis\r\n';
+    	for(let i = 0; i< initialPoints.length;i++){	
+    		saida += 'v '+initialPoints[i].x+' '+initialPoints[i].y+' 0'+'\r\n';	
+    	}
+    	saida += 'f ';
+    	let count = 0;
+    	let anterior;
+    	let array = [];
+    	array.push(indexOfMinPoint2+1);
+    	for(let j = 0 ;j < nextPoints.length;j++){
+    		for(let i = 0; i< initialPoints.length;i++){
+    			if(i != indexOfMinPoint2 && initialPoints[i].x == nextPoints[j].x && initialPoints[i].y == nextPoints[j].y ){
+    				console.log('i: '+i);
+    				array.push(i+1);
+    				console.log('arr: '+array);
+    			}    			
+    		}	
+    	}
+    	console.log('array: '+array)
+    	for (let i = 0; i <array.length; i++) {
+	    		saida += array[i]+' '; 
+    		
+    	}
+    	download('saida',saida);
     }
 });
 
-//apenas depois do evendo da tecla s
-window.addEventListener('keypress',
-function(){
-    if(event.keyCode == 110 && nextPoints.length>0){// 'n'
-        console.log(minPoint);
-        console.log('nextPoints: '+ JSON.stringify(nextPoints));
-        if(nextPoints.length==1){
-            drawLine(nextPoints[0][1].x,nextPoints[0][1].y,minPoint.x,minPoint.y,'#6B7CE8');
-        }
-        else{
-            drawLine(minPoint.x,minPoint.y,nextPoints[0][1].x,nextPoints[0][1].y,'#6B7CE8');
-        }
-        nextPoints.splice(nextPoints[0],1);
-    }
-});
 
-window.addEventListener('keypress',
-function(){
-    if(event.keyCode == 99){// 'c'
-        console.log('c PRESSED')
-        checkMinPoint();
-    }
-});
 
 function getPosition(event){
      
@@ -73,9 +125,9 @@ function getPosition(event){
      let y = event.clientY - rect.top;
      v = new Vec2(x,y);
      points.push(v);
+     initialPoints.push(v);
      drawCoordinates(x,y);
      console.log('ponto:' + '('+v.x+','+v.y+')');
-     checkMinPoint();	    	    
 }
 
 function drawCoordinates(x,y){	
@@ -97,45 +149,14 @@ function drawLine(x1,y1,x2,y2,color){
 	ctx.closePath();
 }
 
-function drawLineMinPoint(point){	
+function drawLineMinPoint(){	
+
     drawLine(minPoint.x,minPoint.y,canvas.width,minPoint.y,"#000");
 }
 
-function pseudoAngle1(u,v){
-    let y = v.x;
-    let x = u.x;
-    if (y >= 0){
-        if (x >= 0){
-            if (x >= y){
-                return y/x;
-            }
-            return 2 - x/y;
-        }
-        if(-x<=y){
-            return 2+(-x)/y;
-        }
-        return 4 - y/(-x);
-    }
-    if(x < 0){
-        if(-x >= -y){
-            return 4 + (-y)/(-x);
-        }
-        return 6-(-x)/(-y);
-    }
-    if(x <= -y){
-        return 6 + x/(-y);
-    }
-    return 8-(-y)/x;
-}
+function cos_vec2(u,v){
 
-function pseudoAngle2(u,v){
-
-    if(isNaN(u.dot(v)/(u.magnitude()*v.magnitude()))){
-        return 1;
-    }
-    else{
-        return 1 - (u.dot(v)/(u.magnitude()*v.magnitude()));
-    }
+        return u.dot(v)/(u.magnitude()*v.magnitude());
 }
 
 function checkMinPoint(){
@@ -145,8 +166,9 @@ function checkMinPoint(){
 
     minPoint =  new Vec2(maxx,miny);
  
-    for (let i = 0; i < points.length; i++) {
-		if (points[i].y > miny) {
+    indexOfMinPoint = 0;       
+    for (let i = 1; i < points.length; i++) {
+		if (points[i].y < miny) {
             miny = points[i].y;
             minPoint = points[i];
             indexOfMinPoint = i;
@@ -155,79 +177,69 @@ function checkMinPoint(){
 
         else if(points[i].y == miny){
             if(points[i].x > maxx){
+            	maxx = points[i].x;
                 minPoint = points[i];
                 indexOfMinPoint = i;
                
             }
         }
-        else{
-            indexOfMinPoint = 0;
-           
-        }
     }
-    pointsAux = [...points];
-    pointsAux.splice(indexOfMinPoint, 1);
-    // return minPoint;
-    // console.log('ponto minimo: '+ '('+minPoint.x+','+minPoint.y+')');
+    console.log('ponto minimo: '+ '('+points[indexOfMinPoint].x+','+points[indexOfMinPoint].y+')');
+   	indexOfMinPoint2 = indexOfMinPoint;
+    //trago ele pro começo aqui trocando ele com o primero de lugar
+    points[indexOfMinPoint] = points[0];
+    points[0] = minPoint;
+    indexOfMinPoint = 0;
+
+    return minPoint;
 }
-/**
- * Inicialmente a função nextPoint recebe o pinto minimo no atributo startPoint 
- * e null na variavel.
- * O vetor pointsAux, inicialmente, são todos os pontos menos o ponto minimo. 
- * @param {*} startPoint 
- * @param {*} endPoint 
- */
-function nextPoint(startPoint){
-    let pointsOrder = [];
-    let peseudoAngleArray = [];
-    let max;
-    let endPoint = new Vec2(1,0);
-    console.log('minPoint: '+ JSON.stringify(minPoint));
-    startPoint = minPoint;
-    let aux;
-    let sub;
-    while(pointsAux.length>0){
-        peseudoAngleArray = [];
-        console.log('endPoint: '+ JSON.stringify(endPoint))
-        //calcula os pseudos usando os pontos e guarda seus valores 
-        for(let i = 0; i < pointsAux.length; i++){
-            console.log('pseudo angulo de : '+endPoint.x+','+endPoint.y+' e '+pointsAux[i].x+','+pointsAux[i].y)
-            console.log('= '+pseudoAngle1(endPoint,pointsAux[i]));
-            peseudoAngleArray.push([i,pointsAux[i],pseudoAngle1(endPoint,pointsAux[i])])
-        }
-        
-        max = getMaxPseudoAngle(peseudoAngleArray);
-        aux = endPoint;
-        sub = max[1].sub(startPoint);
-        drawLine(a,canvas.height,sub.x,sub.y);
-        startPoint = aux;
-        console.log('max objeto: '+ JSON.stringify(max))
-        console.log('Ponto de maximo pseudoangulo :'+max[1].x +','+ max[1].y+ ';' +'pseudoangulo: '+ max[2]);
-        console.log('pointsAux antes do splice: ' + JSON.stringify(pointsAux));
-        pointsAux.splice(max[0],1);
-        console.log('pointsAux depois do splice: ' + JSON.stringify(pointsAux));
-        pointsOrder.push(max);    
+
+function nextPoint2(startPoint){
+
+	next_id = 0;
+    //vejo se ele ja fecha com o primeiro aqui
+	if(startPoint > 1){
+    	max_cos = cos_vec2(dir_vec2, points[0].sub(points[startPoint-1]));
+    	fechou = true;
+    }else{
+    	max_cos = -100;
     }
-     console.log('pointsOrder: ' + JSON.stringify(pointsOrder[1]));
-    return pointsOrder;
+    for (let i = startPoint; i < points.length; i++) {
+        //calculo o vetor do testado pro ponto anterior e faco o angulo com a direcao antiga
+    	actual = cos_vec2(dir_vec2, points[i].sub(points[startPoint-1]));
+        //se for maior ele eh o novo candidato
+    	if(actual>max_cos){
+    		max_cos = actual;
+    		next_id = i;
+    	}
+    }
+    //se o next eh o começo significa q voltei pro primeiro e q o fecho ta fechado
+    if(next_id==0){
+    	points_interated = points.length;
+    	startPoint--;
+    }
+    //levo ele pro fim dos q ja foram testados, ou seja depois dele ta so os caras q eu ainda nao testei e nao tao no fecho   
+    let ax = points[startPoint];
+    points[startPoint] = points[next_id];
+    points[next_id] = ax;
+    return points[startPoint];
 }
-/**
- * Retorna um vetor de duas posições com o ponto na posição 0
- * e o pseudo angulo na posicao 1
- * @param {*} pseudoAngleArray 
- */
-function getMaxPseudoAngle(pseudoAngleArray){
-    let max=[];
-    let aux = 0;
-    for(let i = 0; i< pseudoAngleArray.length;i++){
-        if(pseudoAngleArray[i][2]>aux){
-            max[0] = pseudoAngleArray[i][0];
-            max[1] = pseudoAngleArray[i][1];
-            max[2] = pseudoAngleArray[i][2];
-            aux = pseudoAngleArray[i][2];
-        }
-    }
-    return max;
+
+//================================
+		//CRIAR ARQUIVO
+//================================
+
+function download(filename, text) {
+  let element = document.createElement('a');
+  element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+  element.setAttribute('download', filename+'.obj');
+
+  element.style.display = 'none';
+  document.body.appendChild(element);
+
+  element.click();
+
+  document.body.removeChild(element);
 }
 
 class Vec2 {
@@ -235,12 +247,6 @@ class Vec2 {
         this.x = x;
         this.y = y;
     }
-    // constructor(x1,y1,x2,y2){
-    //     this.x1 = x1;
-    //     this.x2 = x2;
-    //     this.y1 = y1;
-    //     this.y2 = y2;
-    // }
         //norma do vetor(tamanho)
     magnitude(){
         return Math.sqrt(this.x * this.x + this.y * this.y);
@@ -248,7 +254,7 @@ class Vec2 {
 
         //norma do vetor ao quadrado
     squaredMagnitude(){
-        return (x * x + y * y);
+        return (this.x * this.x + this.y * this.y);
     };
 
         //vetor normalizado
@@ -274,14 +280,7 @@ class Vec2 {
 
         //subtraçao de vetores
     sub(v) {
-        return new Vec2(this.x - v.x, this.y -  v.y );
+        return new Vec2(this.x - v.x, this.y - v.y);
     };
 
 }
-
-// let u2 = new Vec2(574,304);
-// let v2 = new Vec2(432,174)
-// let v3 = new Vec2(318,118)
-// console.log(pseudoAngle1(u2,u2));
-// console.log(pseudoAngle1(u2,v2));
-// console.log(pseudoAngle1(u2,v3));
