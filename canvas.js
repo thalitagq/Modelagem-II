@@ -23,7 +23,10 @@ let indexOfMinPoint2;
 
 window.addEventListener('click', 
 	function(){
-		getPosition(event);
+        if(document.getElementById('myModal').style.display === 'none'){
+            getPosition(event);
+        }
+
 });
 
 //desenha o vetor do ponto minimo
@@ -116,6 +119,32 @@ function(){
     }
 });
 
+let modal = document.getElementById("myModal");
+let span = document.getElementsByClassName("close")[0];
+
+//abre modal para escolher arquivo
+window.addEventListener('keypress',
+    function(){ 
+        if(event.keyCode == 102){// 'f'
+            modal.style.display = "block";
+
+            // When the user clicks anywhere outside of the modal, close it
+            window.onclick = function(event) {
+                if (event.target == modal) {
+                    modal.style.display = "none";
+                }
+            }
+        }
+    });
+
+    //fecha modal de escolha de arquivo
+window.addEventListener('keypress',
+	function(){
+        //calculo a minima só aqui e trago ele pro começo do vetor
+		if(event.keyCode == 120){// 'x'
+            modal.style.display = "none";
+        }
+});
 
 
 function getPosition(event){
@@ -241,6 +270,65 @@ function download(filename, text) {
 
   document.body.removeChild(element);
 }
+
+
+// function readTextFile(file)
+// {
+//     var rawFile = new XMLHttpRequest();
+//     rawFile.open("GET", file, false);
+//     rawFile.onreadystatechange = function ()
+//     {
+//         if(rawFile.readyState === 4)
+//         {
+//             if(rawFile.status === 200 || rawFile.status == 0)
+//             {
+//                 var allText = rawFile.responseText;
+//                 alert(allText);
+//             }
+//         }
+//     }
+//     rawFile.send(null);
+// }
+
+
+//================================
+		//LER ARQUIVO 
+//================================
+let fileArray = [];  // where I will store the contents
+
+function readMultipleFiles(evt) {
+    //Retrieve all the files from the FileList object
+    var files = evt.target.files;
+    window.array = []
+    let a
+    if (files) {
+        for (let i = 0, f; f = files[i]; i++) {
+            let r = new FileReader();
+            r.onload = (function (f) {
+                return function (e) {
+                    let contents = e.target.result;
+                    window.array.push(contents);
+                    fileArray =[...contents.split("\n")];
+                    fileArray[0].split(" ")
+
+                    for(i = 0; i<fileArray.length;i++){
+                        a = [...fileArray[i].split(" ")];
+                        v = new Vec2(a[0],a[1]);
+                        points.push(v);
+                        initialPoints.push(v)
+                        drawCoordinates(a[0],a[1])
+                    }
+                    modal.style.display = "none";
+                };
+            })(f);
+            r.readAsText(f);
+        }
+    } else {
+        alert("Failed to load files");
+    }
+}
+document.getElementById('fileInput').addEventListener('change', readMultipleFiles, false);
+
 
 class Vec2 {
     constructor(x, y) {
