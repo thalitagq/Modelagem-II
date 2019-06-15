@@ -6,6 +6,7 @@ f - Abre modal para escolher um arquivos com pontos para calcular o fecho
         100 50    //primeiro ponto
         30  20    // segundo ponto 
         ...  
-    sendo a primeira string da esquerda para direita a coordenada x do ponto e a segunda string da mesma linha é y,    
+    sendo a primeira string da esquerda para direita a coordenada x do ponto e a segunda string da mesma linha é y
+    Obs: não pular linha caso não queira mais adicionar mais pontos
 x - Fecha modal
 d - Faz download de um arquivo .obj 

@@ -20,6 +20,7 @@ let dir_vec2;
 let initialPoints = [];
 let indexesOfNextsPoints = [];
 let indexOfMinPoint2;
+let pointsTriang = []
 
 window.addEventListener('click', 
 	function(){
@@ -146,6 +147,16 @@ window.addEventListener('keypress',
         }
 });
 
+//organiza os pontos
+window.addEventListener('keypress',
+	function(){
+
+        if(event.keyCode == 114){// 'r'
+            // console.log(pointsTriang)
+            console.log(bubbleSort(pointsTriang))
+        }
+});
+
 
 function getPosition(event){
      
@@ -254,6 +265,43 @@ function nextPoint2(startPoint){
     return points[startPoint];
 }
 
+function bubbleSort(array) {
+
+    // Use an isSorted flag to determine whether or not there
+    // is more sorting to do when we are in the while loop
+    let isSorted = false;
+
+    while(!isSorted) {
+
+        // Mark is sorted true, then re-mark it false in the loop.
+        // If the loop is finished, then isSorted will stay true
+        // and we will thus exit the while loop and return
+        isSorted = true;
+
+        for(let i = 0; i < array.length - 1; i++) {
+            let a = array[i].x ;
+            let b = array[i+1].x;
+            c = a > b
+            console.log(c)
+            if(a > b) {
+                // Swap by holding the first element in a temp variable,
+                // then reassigning indexes i and i+1 to each other
+                let temp = array[i];
+                array[i] = array[i + 1];
+                array[i + 1] = temp;
+                // Mark the isSorted flag false because there is still sorting to do if we are in the loop
+                isSorted = false;
+            }
+        }
+    }
+    // Return the sorted array!
+   
+    return array;
+}
+
+
+    
+
 //================================
 		//CRIAR ARQUIVO
 //================================
@@ -300,7 +348,6 @@ function readMultipleFiles(evt) {
     //Retrieve all the files from the FileList object
     var files = evt.target.files;
     window.array = []
-    let a
     if (files) {
         for (let i = 0, f; f = files[i]; i++) {
             let r = new FileReader();
@@ -308,15 +355,11 @@ function readMultipleFiles(evt) {
                 return function (e) {
                     let contents = e.target.result;
                     window.array.push(contents);
-                    fileArray =[...contents.split("\n")];
-                    fileArray[0].split(" ")
-
+                    fileArray = [...contents.split("\r\n")];
                     for(i = 0; i<fileArray.length;i++){
-                        a = [...fileArray[i].split(" ")];
-                        v = new Vec2(a[0],a[1]);
-                        points.push(v);
-                        initialPoints.push(v)
-                        drawCoordinates(a[0],a[1])
+                        let a = [...fileArray[i].split(" ")];
+                        pointsTriang.push(new Vec2(Number(a[0]),Number(a[1])));
+                        drawCoordinates(a[0],a[1]) 
                     }
                     modal.style.display = "none";
                 };
