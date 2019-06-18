@@ -157,6 +157,16 @@ window.addEventListener('keypress',
         }
 });
 
+//triangulação
+window.addEventListener('keypress',
+	function(){
+
+        if(event.keyCode == 116){// 't'
+            console.log('triangulação');
+            bubbleSort(pointsTriang)
+            triang();
+        }
+});
 
 function getPosition(event){
      
@@ -166,6 +176,7 @@ function getPosition(event){
      v = new Vec2(x,y);
      points.push(v);
      initialPoints.push(v);
+     pointsTriang.push(v);
      drawCoordinates(x,y);
      console.log('ponto:' + '('+v.x+','+v.y+')');
 }
@@ -319,26 +330,6 @@ function download(filename, text) {
   document.body.removeChild(element);
 }
 
-
-// function readTextFile(file)
-// {
-//     var rawFile = new XMLHttpRequest();
-//     rawFile.open("GET", file, false);
-//     rawFile.onreadystatechange = function ()
-//     {
-//         if(rawFile.readyState === 4)
-//         {
-//             if(rawFile.status === 200 || rawFile.status == 0)
-//             {
-//                 var allText = rawFile.responseText;
-//                 alert(allText);
-//             }
-//         }
-//     }
-//     rawFile.send(null);
-// }
-
-
 //================================
 		//LER ARQUIVO 
 //================================
@@ -372,6 +363,38 @@ function readMultipleFiles(evt) {
 }
 document.getElementById('fileInput').addEventListener('change', readMultipleFiles, false);
 
+let triangulos = [];
+
+function triang(){
+    count = pointsTriang.length;
+    while (count>0) {
+        if (count == pointsTriang.length) {
+            triangulos.push(new Triang(pointsTriang[0],pointsTriang[1],pointsTriang[2]));
+            pointsTriang.splice(0,3);
+            count = pointsTriang.length;
+            drawLine(triangulos[0].p1.x,triangulos[0].p1.y,triangulos[0].p3.x,triangulos[0].p3.y)
+            drawLine(triangulos[0].p3.x,triangulos[0].p3.y,triangulos[0].p2.x,triangulos[0].p2.y)
+            drawLine(triangulos[0].p2.x,triangulos[0].p2.y,triangulos[0].p1.x,triangulos[0].p1.y)
+        }
+
+        for(let i=1; i<=triangulos.length;i++){
+            console.log('P1P3 vetorial P1P: '+triangulos[triangulos.length-1].vec1.cross(pointsTriang[0].sub(triangulos[triangulos.length-1].p1)));//p3-p1
+            console.log('P3P2 vetorial P3P: '+triangulos[triangulos.length-1].vec2.cross(pointsTriang[0].sub(triangulos[triangulos.length-1].p3)));//p2-p3
+            console.log('P2P1 vetorial P2P: '+triangulos[triangulos.length-1].vec3.cross(pointsTriang[0].sub(triangulos[triangulos.length-1].p2)));//p1-p2
+            let teste1 = triangulos[triangulos.length-1].vec1.cross(pointsTriang[0].sub(triangulos[triangulos.length-1].p1));//P1P3 vetorial P1P: 
+            let teste2 = triangulos[triangulos.length-1].vec2.cross(pointsTriang[0].sub(triangulos[triangulos.length-1].p3));//P3P2 vetorial P3P
+            let teste3 = triangulos[triangulos.length-1].vec3.cross(pointsTriang[0].sub(triangulos[triangulos.length-1].p2));//P2P1 vetorial P2P
+            // if (teste1<0) {
+            //     triangulos.push(new Triang(pointsTriang[1],pointsTriang[i-1],pointsTriang[2]));
+            // }
+
+        }
+        // triangulos.push(new Triang(triangulos[triangulos.length-1].p2,triangulos[triangulos.length-1].p3,pointsTriang[0]))
+        // pointsTriang.splice(0,1);
+        // count = pointsTriang.length;
+    }
+    console.log(JSON.stringify(triangulos))
+}
 
 class Vec2 {
     constructor(x, y) {
@@ -415,3 +438,17 @@ class Vec2 {
     };
 
 }
+
+class Triang{
+    constructor(p1, p2, p3) {
+        this.p1 = p1;
+        this.p2 = p2;
+        this.p3 = p3;
+        
+        this.vec1 = p3.sub(p1);//P1P3 = p3-p1
+        this.vec2 = p2.sub(p3);//P3P2 = p2-p3
+        this.vec3 = p1.sub(p2);//P2P1 = p1-p2
+
+    }
+}
+
