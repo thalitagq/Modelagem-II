@@ -20,7 +20,8 @@ let dir_vec2;
 let initialPoints = [];
 let indexesOfNextsPoints = [];
 let indexOfMinPoint2;
-let pointsTriang = []
+let pointsTriang = [];
+let candidatos =[];
 
 window.addEventListener('click', 
 	function(){
@@ -160,11 +161,11 @@ window.addEventListener('keypress',
 //triangulação
 window.addEventListener('keypress',
 	function(){
-
         if(event.keyCode == 116){// 't'
             console.log('triangulação');
             bubbleSort(pointsTriang)
             triang();
+            drawArestas();
         }
 });
 
@@ -293,7 +294,6 @@ function bubbleSort(array) {
             let a = array[i].x ;
             let b = array[i+1].x;
             c = a > b
-            console.log(c)
             if(a > b) {
                 // Swap by holding the first element in a temp variable,
                 // then reassigning indexes i and i+1 to each other
@@ -309,9 +309,6 @@ function bubbleSort(array) {
    
     return array;
 }
-
-
-    
 
 //================================
 		//CRIAR ARQUIVO
@@ -364,36 +361,105 @@ function readMultipleFiles(evt) {
 document.getElementById('fileInput').addEventListener('change', readMultipleFiles, false);
 
 let triangulos = [];
-
+let arestas = [];
 function triang(){
-    count = pointsTriang.length;
-    while (count>0) {
-        if (count == pointsTriang.length) {
+    //count = pointsTriang.length;
+    start = 0;
+    while (pointsTriang.length>0) {
+        if (start == 0) {
             triangulos.push(new Triang(pointsTriang[0],pointsTriang[1],pointsTriang[2]));
+            arestas.push(new Aresta(pointsTriang[0],pointsTriang[1]));
+            arestas.push(new Aresta(pointsTriang[1],pointsTriang[2]));
+            arestas.push(new Aresta(pointsTriang[2],pointsTriang[0]));
             pointsTriang.splice(0,3);
             count = pointsTriang.length;
+            start += 1;
             drawLine(triangulos[0].p1.x,triangulos[0].p1.y,triangulos[0].p3.x,triangulos[0].p3.y)
             drawLine(triangulos[0].p3.x,triangulos[0].p3.y,triangulos[0].p2.x,triangulos[0].p2.y)
             drawLine(triangulos[0].p2.x,triangulos[0].p2.y,triangulos[0].p1.x,triangulos[0].p1.y)
         }
 
-        for(let i=1; i<=triangulos.length;i++){
-            console.log('P1P3 vetorial P1P: '+triangulos[triangulos.length-1].vec1.cross(pointsTriang[0].sub(triangulos[triangulos.length-1].p1)));//p3-p1
-            console.log('P3P2 vetorial P3P: '+triangulos[triangulos.length-1].vec2.cross(pointsTriang[0].sub(triangulos[triangulos.length-1].p3)));//p2-p3
-            console.log('P2P1 vetorial P2P: '+triangulos[triangulos.length-1].vec3.cross(pointsTriang[0].sub(triangulos[triangulos.length-1].p2)));//p1-p2
-            let teste1 = triangulos[triangulos.length-1].vec1.cross(pointsTriang[0].sub(triangulos[triangulos.length-1].p1));//P1P3 vetorial P1P: 
-            let teste2 = triangulos[triangulos.length-1].vec2.cross(pointsTriang[0].sub(triangulos[triangulos.length-1].p3));//P3P2 vetorial P3P
-            let teste3 = triangulos[triangulos.length-1].vec3.cross(pointsTriang[0].sub(triangulos[triangulos.length-1].p2));//P2P1 vetorial P2P
-            // if (teste1<0) {
-            //     triangulos.push(new Triang(pointsTriang[1],pointsTriang[i-1],pointsTriang[2]));
-            // }
+        // let triangulo = triangulos[start-1];
+        // for(let j=0; j<3;j++){
+        //     let arestaTeste = new Aresta(pointsTriang[0],triangulo.pontos[j]);
+        //     for (let k=0; k < arestas.length; k++) {
+
+        //         if(arestaTeste.checkArestaIgual(arestas[k]) || testaAresta(arestaTeste, arestas[k])){
+        //             candidatos.push(arestaTeste)
+        //             candidatos.push(new Aresta(arestaTeste.p1,arestas[k].p2));
+        //         }
+        //         else{
+        //             console.log('arestas: '+JSON.stringify(arestaTeste.p1)+','+JSON.stringify(arestaTeste.p2)+' e '+ JSON.stringify(arestas[k].p1)+','+JSON.stringify(arestas[k].p2))
+        //             console.log('são iguais ou colidem')
+        //         }
+        //     }
+        // }
+        let arestaTeste1;
+        let arestaTeste2;
+        for(let k=0; k<arestas.length;k++){
+            arestaTeste1 = new Aresta(pointsTriang[0],arestas[k].p1);
+            arestaTeste2 = new Aresta(pointsTriang[0],arestas[k].p2);
+            console.log('aresta: '+k+' ponto 1'+JSON.stringify(arestaTeste1.p1)+','+JSON.stringify(arestaTeste1.p2)+' e '+ JSON.stringify(arestas[k].p1)+','+JSON.stringify(arestas[k].p2))
+            console.log('aresta: '+k+' ponto 2'+JSON.stringify(arestaTeste2.p1)+','+JSON.stringify(arestaTeste2.p2)+' e '+ JSON.stringify(arestas[k].p1)+','+JSON.stringify(arestas[k].p2))
+            if(arestaTeste1.checkArestaIgual(arestas[k]) || testaAresta(arestaTeste1, arestas[k])){
+                candidatos.push(arestaTeste1)
+                candidatos.push(new Aresta(arestaTeste1.p1,arestas[k].p2));
+                console.log('adicionar')
+            }
+            else{
+                console.log('não adicionar')
+            }
+            if(arestaTeste2.checkArestaIgual(arestas[k]) || testaAresta(arestaTeste2, arestas[k])){
+                candidatos.push(arestaTeste2)
+                candidatos.push(new Aresta(arestaTeste2.p1,arestas[k].p2));
+                console.log('adicionar')
+            }
+            else{
+                console.log('não adicionar')
+            }
+            console.log('candidatos iniciais: '+ JSON.stringify(candidatos));
+
+            for (l=0; l<candidatos.length; l++) {
+                for (m=0; m<arestas.length; m++) { // <-- no need to check the values before "i"
+                    if (!testaAresta(candidatos[l], arestas[m])) {
+                        console.log('remover candidato: ' + JSON.stringify(candidatos[l]))
+                        candidatos.splice(l,1);
+                    }
+                }
+            }
 
         }
-        // triangulos.push(new Triang(triangulos[triangulos.length-1].p2,triangulos[triangulos.length-1].p3,pointsTriang[0]))
-        // pointsTriang.splice(0,1);
-        // count = pointsTriang.length;
+        start += 1;
+        pointsTriang.splice(0,1);
     }
-    console.log(JSON.stringify(triangulos))
+    removeArestasDupli(candidatos);
+    // console.log(JSON.stringify(triangulos))
+}
+
+function testaAresta(AB, CD){
+    if(AB.aresta.cross(CD.p1.sub(AB.p1)) == AB.aresta.cross(CD.p2.sub(AB.p1)) 
+      && CD.aresta.cross(AB.p1.sub(CD.p1)) == CD.aresta.cross(AB.p2.sub(CD.p1)) ){
+        console.log('As arestas não colidem! Ligaaaa os pontos aê')
+        return true; 
+    }
+    else return false;
+}
+
+function removeArestasDupli(arestas){
+    for (i=0; i<arestas.length; i++) {
+        for (k=i+1; k<arestas.length; k++) { // <-- no need to check the values before "i"
+            if (arestas[i].check(arestas[k])) {
+                arestas.splice(k,1);
+            }
+        }
+    }
+    return arestas;
+}
+
+function drawArestas(){
+    for (let i = 0; i < candidatos.length; i++) {
+        drawLine(candidatos[i].p1.x,candidatos[i].p1.y,candidatos[i].p2.x,candidatos[i].p2.y,"red");   
+    }
 }
 
 class Vec2 {
@@ -436,15 +502,26 @@ class Vec2 {
     sub(v) {
         return new Vec2(this.x - v.x, this.y - v.y);
     };
+    checkIgual(v){
+        if(this.x == v.x && this.y == v.y){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
 
 }
 
 class Triang{
     constructor(p1, p2, p3) {
-        this.p1 = p1;
-        this.p2 = p2;
-        this.p3 = p3;
-        
+        this.p1 = new Vec2(p1.x,p1.y);
+        this.p2 = new Vec2(p2.x,p2.y);
+        this.p3 = new Vec2(p3.x,p3.y);
+        this.pontos =[];
+        this.pontos[0] = this.p1;
+        this.pontos[1] = this.p2;
+        this.pontos[2] = this.p3;
         this.vec1 = p3.sub(p1);//P1P3 = p3-p1
         this.vec2 = p2.sub(p3);//P3P2 = p2-p3
         this.vec3 = p1.sub(p2);//P2P1 = p1-p2
@@ -452,3 +529,35 @@ class Triang{
     }
 }
 
+class Aresta{
+    constructor(p1, p2) {
+        this.p1 = new Vec2(p1.x,p1.y);
+        this.p2 = new Vec2(p2.x,p2.y);
+
+        this.aresta = p2.sub(p1);//P3P2 = p2-p3
+    }
+
+    checkArestaIgual(aresta){//checa se tem algum ponto em comum
+        if(this.p1.checkIgual(aresta.p1) || this.p2.checkIgual(aresta.p2)){
+            return true;
+        }
+        else if(this.p1.checkIgual(aresta.p2) || this.p2.checkIgual(aresta.p1)){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+
+    check(aresta){//checa se é exatamente igual
+        if(this.p1.checkIgual(aresta.p1) && this.p2.checkIgual(aresta.p2)){
+            return true;
+        }
+        else if(this.p1.checkIgual(aresta.p2) && this.p2.checkIgual(aresta.p1)){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+}
