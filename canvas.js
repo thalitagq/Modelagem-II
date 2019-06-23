@@ -418,9 +418,8 @@ function triang(){
                 console.log('não adicionar')
             }
             console.log('candidatos iniciais: '+ JSON.stringify(candidatos));
-
-            for (l=0; l<candidatos.length; l++) {
-                for (m=0; m<arestas.length; m++) { // <-- no need to check the values before "i"
+            for (let m=0; m<arestas.length; m++) {
+                for (let l=0; l<candidatos.length; l++) { // <-- no need to check the values before "i"
                     if (!testaAresta(candidatos[l], arestas[m])) {
                         console.log('remover candidato: ' + JSON.stringify(candidatos[l]))
                         candidatos.splice(l,1);
