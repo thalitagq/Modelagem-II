@@ -362,6 +362,8 @@ document.getElementById('fileInput').addEventListener('change', readMultipleFile
 
 let triangulos = [];
 let arestas = [];
+let ptsTriang = [];
+let u = []
 function triang(){
     //count = pointsTriang.length;
     start = 0;
@@ -371,6 +373,9 @@ function triang(){
             arestas.push(new Aresta(pointsTriang[0],pointsTriang[1]));
             arestas.push(new Aresta(pointsTriang[1],pointsTriang[2]));
             arestas.push(new Aresta(pointsTriang[2],pointsTriang[0]));
+            ptsTriang.push(pointsTriang[0]);
+            ptsTriang.push(pointsTriang[1]);
+            ptsTriang.push(pointsTriang[2]);
             pointsTriang.splice(0,3);
             count = pointsTriang.length;
             start += 1;
@@ -378,67 +383,79 @@ function triang(){
             drawLine(triangulos[0].p3.x,triangulos[0].p3.y,triangulos[0].p2.x,triangulos[0].p2.y)
             drawLine(triangulos[0].p2.x,triangulos[0].p2.y,triangulos[0].p1.x,triangulos[0].p1.y)
         }
-
-        // let triangulo = triangulos[start-1];
-        // for(let j=0; j<3;j++){
-        //     let arestaTeste = new Aresta(pointsTriang[0],triangulo.pontos[j]);
-        //     for (let k=0; k < arestas.length; k++) {
-
-        //         if(arestaTeste.checkArestaIgual(arestas[k]) || testaAresta(arestaTeste, arestas[k])){
-        //             candidatos.push(arestaTeste)
-        //             candidatos.push(new Aresta(arestaTeste.p1,arestas[k].p2));
-        //         }
-        //         else{
-        //             console.log('arestas: '+JSON.stringify(arestaTeste.p1)+','+JSON.stringify(arestaTeste.p2)+' e '+ JSON.stringify(arestas[k].p1)+','+JSON.stringify(arestas[k].p2))
-        //             console.log('são iguais ou colidem')
-        //         }
-        //     }
-        // }
-        let arestaTeste1;
+        let arestaTeste;
         let arestaTeste2;
-        for(let k=0; k<arestas.length;k++){
-            arestaTeste1 = new Aresta(pointsTriang[0],arestas[k].p1);
-            arestaTeste2 = new Aresta(pointsTriang[0],arestas[k].p2);
-            console.log('aresta: '+k+' ponto 1'+JSON.stringify(arestaTeste1.p1)+','+JSON.stringify(arestaTeste1.p2)+' e '+ JSON.stringify(arestas[k].p1)+','+JSON.stringify(arestas[k].p2))
-            console.log('aresta: '+k+' ponto 2'+JSON.stringify(arestaTeste2.p1)+','+JSON.stringify(arestaTeste2.p2)+' e '+ JSON.stringify(arestas[k].p1)+','+JSON.stringify(arestas[k].p2))
-            if(arestaTeste1.checkArestaIgual(arestas[k]) || testaAresta(arestaTeste1, arestas[k])){
-                candidatos.push(arestaTeste1)
-                candidatos.push(new Aresta(arestaTeste1.p1,arestas[k].p2));
-                console.log('adicionar')
-            }
-            else{
-                console.log('não adicionar')
-            }
-            if(arestaTeste2.checkArestaIgual(arestas[k]) || testaAresta(arestaTeste2, arestas[k])){
-                candidatos.push(arestaTeste2)
-                candidatos.push(new Aresta(arestaTeste2.p1,arestas[k].p2));
-                console.log('adicionar')
-            }
-            else{
-                console.log('não adicionar')
-            }
-            console.log('candidatos iniciais: '+ JSON.stringify(candidatos));
-            for (let m=0; m<arestas.length; m++) {
-                for (let l=0; l<candidatos.length; l++) { // <-- no need to check the values before "i"
-                    if (!testaAresta(candidatos[l], arestas[m])) {
-                        console.log('remover candidato: ' + JSON.stringify(candidatos[l]))
-                        candidatos.splice(l,1);
+        for(let k=0; k<ptsTriang.length;k++){
+            arestaTeste = new Aresta(pointsTriang[0],ptsTriang[k]);
+            for(let o = 0;  o < arestas.length; o++){
+                console.log('arestaTeste: '+k+": "+JSON.stringify(arestaTeste.p1)+','+JSON.stringify(arestaTeste.p2)+' e arestas '+ o +JSON.stringify(arestas[o].p1)+','+JSON.stringify(arestas[o].p2))
+                // if(arestaTeste.checkArestaIgual(arestas[o]) || testaAresta(arestaTeste, arestas[o])){
+                //     candidatos.push(arestaTeste)
+                //     console.log('tem ponto em comum: '+ arestaTeste.checkArestaIgual(arestas[o]))
+                //     console.log('não colidem: '+ testaAresta(arestaTeste, arestas[o]))
+                //     console.log('adicionar: '+ JSON.stringify(arestaTeste.p1)+" , "+JSON.stringify(arestaTeste.p2))
+                // }
+                
+                // else{
+                //     console.log('não adicionar')
+                // }
+                if(arestaTeste.checkArestaIgual(arestas[o])){
+                    if(arestaTeste.p2.checkIgual(arestas[o].p1)){
+                        candidatos.push(new Aresta(arestaTeste.p1,arestas[o].p2))
+                        arestas.push(new Aresta(arestaTeste.p1,arestas[o].p2))
+                        console.log('ponto em comum');
+                        console.log('adicionar: '+ JSON.stringify(arestaTeste.p1)+" , "+JSON.stringify(arestas[o].p2))
+                        console.log('\n')
+                    }
+                    // else if(arestaTeste.p1.checkIgual(arestas[o].p2)){
+                    //     candidatos.push(new Atesta(arestaTeste.p1,arestas[o].p1))
+                    //     console.log('ponto em comum');
+                    //     console.log('adicionar: '+ JSON.stringify(arestaTeste.p1)+" , "+JSON.stringify(arestas[o].p2))
+                    //     console.log('\n')
+                    // }
+                    else {
+                        console.log('ponto em comum')
+                        candidatos.push(new Aresta(arestaTeste.p1,arestas[o].p1))
+                        console.log('adicionar: '+ JSON.stringify(arestaTeste.p1)+" , "+JSON.stringify(arestas[o].p1))
+                        console.log('\n')
                     }
                 }
-            }
+                else if(!arestaTeste.checkArestaIgual(arestas[o]) && testaAresta(arestaTeste, arestas[o])){
+                    console.log('não tem ponto em comum e não colidem')
+                    candidatos.push(arestaTeste)
+                    console.log('adicionar: '+ JSON.stringify(arestaTeste.p1)+" , "+JSON.stringify(arestaTeste.p2))
+                    console.log('\n')
+                }
+                else{
+                    console.log('não adicionar')
+                    console.log('\n')
+                }
 
+            }
+        
+            // console.log('candidatos iniciais: '+ JSON.stringify(candidatos));
+            // for (let m=0; m<arestas.length; m++) {
+            //     for (let l=0; l<candidatos.length; l++) {
+            //         if (!testaAresta(candidatos[l], arestas[m])) {
+            //             console.log('remover candidato: ' + JSON.stringify(candidatos[l]))
+            //             candidatos.splice(l,1);
+            //         }
+            //     }
+            // }
         }
         start += 1;
+        // for (let x = 0; x < candidatos.length; x++) {
+        //     arestas.push(candidatos[x]);
+        // }
+        ptsTriang.push(pointsTriang[0]);
         pointsTriang.splice(0,1);
     }
     removeArestasDupli(candidatos);
-    // console.log(JSON.stringify(triangulos))
 }
 
 function testaAresta(AB, CD){
-    if(AB.aresta.cross(CD.p1.sub(AB.p1)) == AB.aresta.cross(CD.p2.sub(AB.p1)) 
-      && CD.aresta.cross(AB.p1.sub(CD.p1)) == CD.aresta.cross(AB.p2.sub(CD.p1)) ){
-        console.log('As arestas não colidem! Ligaaaa os pontos aê')
+    if(Math.sign(AB.aresta.cross(CD.p1.sub(AB.p1))) == Math.sign(AB.aresta.cross(CD.p2.sub(AB.p1))) 
+      || Math.sign(CD.aresta.cross(AB.p1.sub(CD.p1))) == Math.sign(CD.aresta.cross(AB.p2.sub(CD.p1))) ){
         return true; 
     }
     else return false;
