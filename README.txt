@@ -9,4 +9,5 @@ f - Abre modal para escolher um arquivos com pontos para calcular o fecho
     sendo a primeira string da esquerda para direita a coordenada x do ponto e a segunda string da mesma linha é y
     Obs: não pular linha caso não queira mais adicionar mais pontos
 x - Fecha modal
+t - Após a escolha dos pontos, faz o calculo da triangulação
 d - Faz download de um arquivo .obj 

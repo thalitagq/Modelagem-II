@@ -363,9 +363,7 @@ document.getElementById('fileInput').addEventListener('change', readMultipleFile
 let triangulos = [];
 let arestas = [];
 let ptsTriang = [];
-let u = []
 function triang(){
-    //count = pointsTriang.length;
     start = 0;
     while (pointsTriang.length>0) {
         if (start == 0) {
@@ -384,7 +382,6 @@ function triang(){
             drawLine(triangulos[0].p2.x,triangulos[0].p2.y,triangulos[0].p1.x,triangulos[0].p1.y)
         }
         let arestaTeste;
-        let arestaTeste2;
         for(let k=0; k<ptsTriang.length;k++){
             arestaTeste = new Aresta(pointsTriang[0],ptsTriang[k]);
             add = true;
@@ -403,7 +400,6 @@ function triang(){
                         add = false;
                     }
                 }
-
             }
             if(add){
                 arestas.push(arestaTeste)   
