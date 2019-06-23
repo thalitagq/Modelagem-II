@@ -347,6 +347,7 @@ function readMultipleFiles(evt) {
                     for(i = 0; i<fileArray.length;i++){
                         let a = [...fileArray[i].split(" ")];
                         pointsTriang.push(new Vec2(Number(a[0]),Number(a[1])));
+                        points.push(new Vec2(Number(a[0]),Number(a[1])));
                         drawCoordinates(a[0],a[1]) 
                     }
                     modal.style.display = "none";
